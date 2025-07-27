@@ -22,7 +22,7 @@ Running=True
 Program=["LOAD R1, 10",
          "LOAD R2, 11",
          "ADD R1, R2",  #Store addition in R1
-         "STORE R1,12"  #Store R1's value in Mem[12]
+         "STORE R1, 12",  #Store R1's value in Mem[12]
          "HLT"]
 
 #Initialize the RAM with random values
@@ -55,6 +55,7 @@ def decode():
         addr=instruction[2]
         if addr.lstrip('#')=='#':
             #Is Value
+            addr=addr.rstrip('#')
             value=int(addr)
             print("Executing Instruction \n\t",IR)
 
@@ -62,21 +63,17 @@ def decode():
             MDR=value
             registers[reg]=MDR
 
-            print(f'''  \tMDR <- {value}\n
-                        \t{reg} <- {MDR}''')
+            print(f"MDR <- {value}\n{reg} <- {MDR}")
         else:
             #Is Memory Address
-            addr=addr.rstrip('#')
             print("Executing Instruction \n\t",IR)
 
             #Do R1=M[10]
-            MAR=addr
+            MAR=int(addr)
             MDR=RAM[MAR]
             registers[reg]=MDR
 
-            print(f'''  \tMAR <- {addr}\n
-                        \tMDR <- M[{MAR}]\n
-                        \t{reg} <- {MDR}''')
+            print(f"MAR <- {addr}\nMDR <- M[{MAR}]\n{reg} <- {MDR}")
     
     elif mcInstructions=="STORE":
         reg=instruction[1].rstrip(',')
@@ -87,21 +84,18 @@ def decode():
         MAR=addr
         MDR=registers[reg]
         RAM[MAR]=MDR
-        print(f'''\tMAR <- {addr}\n
-                    \tMDR <- reg\n
-                    \tM[{MAR}] <- {MDR}''')
+        print(f"MAR <- {addr}\nMDR <- reg\nM[{MAR}] <- {MDR}")
         
     elif mcInstructions=="ADD":
-        reg1= mcInstructions[1].rstrip(',')
-        reg2= mcInstructions[2]
+        reg1= instruction[1].rstrip(',')
+        reg2= instruction[2]
         print(f"[Execute] Instruction: \n\t{IR}")
 
         ALU_Res=registers[reg1]+registers[reg2]
         registers[reg1]=ALU_Res
 
-        print(f'''\tALU <- {reg1} + {reg2}
-              \n\t{reg1} <- ALU''')
-        
+        print(f"ALU <- {reg1} + {reg2}\n{reg1} <- ALU")
+
     elif mcInstructions=="HLT":
         print(f"[Execute] Instruction: \n\t{IR}")
         print("MicroOps: Halt the CPU")
@@ -109,19 +103,13 @@ def decode():
 
 def runCPU():
     global Running
+    print("=== CPU Execution Start ===")
     while Running:
-        print("=== CPU Execution Start ===")
         fetch()
         decode()
         print("Registers", registers)
         print('-'*40)
-        print("=== CPU Execution End ===")
-        print(f"Final RAM[12] = {RAM[12]}")
+    print("=== CPU Execution End ===")
+    print(f"Final RAM[12] = {RAM[12]}")
 
 runCPU()
-
-
-    
-
-
-
